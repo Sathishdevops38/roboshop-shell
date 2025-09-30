@@ -12,7 +12,7 @@ Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
 
 #check the script is executing by Root user not 
-if [ $USER_ID -ne 0]; then
+if [ $USER_ID -ne 0 ]; then
     echo -e "$R ERRROR$N:: Run the script with root privillages"
     exit 1
 fi
