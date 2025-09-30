@@ -10,7 +10,7 @@ USER_ID=$(id -u)
 Logs_Folder="/var/log/shell-roboshop"
 Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
-SCRIPT_DIR=$PWD
+START_TIME=$(date +%s)
 
 #check the script is executing by Root user not 
 if [ $USER_ID -ne 0 ]; then
@@ -28,10 +28,10 @@ validate(){
 }
 
 ####Redis#####
-dnf module disable redis -y
+dnf module disable redis -y &>>$Logs_File
 validate $? "Disable default redis package"
 
-dnf module enable redis:7 -y
+dnf module enable redis:7 -y &>>$Logs_File
 validate $? "Enable redis 7"
 
 dnf install redis -y &>>$Logs_File
