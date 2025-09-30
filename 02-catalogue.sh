@@ -46,7 +46,12 @@ else
 fi
 
 mkdir /app
-validate $? "Creating app directory"
+if [ $? -ne 0 ]; then
+    echo "app folder already exists .. $Y SKIPPING$N"
+else
+    echo "create the app folder"
+    validate $? "Creating app directory"
+fi    
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
 validate $? "Downloading catalogue application"
