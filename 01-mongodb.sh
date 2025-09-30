@@ -40,7 +40,7 @@ systemctl start mongod
 validate $? "Starting mongo service"
 
 sed -i 's/127.0.0.0/0.0.0.0/g' /etc/mongod.conf
-validate $? "mofidified the mongo config file"
+validate $? "modified the mongo config file"
 
 systemctl restart mongod
 validate $? "Restarted MongoDB"
