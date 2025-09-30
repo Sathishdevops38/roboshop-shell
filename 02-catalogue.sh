@@ -50,7 +50,6 @@ mkdir /app
 if [ $? -ne 0 ]; then
     echo -e "app folder already exists .. $Y SKIPPING$N"
 else
-    echo "create the app folder"
     validate $? "Creating app directory"
 fi    
 
