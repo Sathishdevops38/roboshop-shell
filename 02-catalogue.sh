@@ -10,6 +10,7 @@ USER_ID=$(id -u)
 Logs_Folder="/var/log/shell-roboshop"
 Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
+SCRIPT_DIR=$PWD
 
 #check the script is executing by Root user not 
 if [ $USER_ID -ne 0 ]; then
@@ -47,7 +48,7 @@ fi
 
 mkdir /app
 if [ $? -ne 0 ]; then
-    echo "app folder already exists .. $Y SKIPPING$N"
+    echo -e "app folder already exists .. $Y SKIPPING$N"
 else
     echo "create the app folder"
     validate $? "Creating app directory"
@@ -68,7 +69,7 @@ validate $? "Unzip catalogue"
 npm install 
 validate $? "Install dependincies"
 
-cp catalogue-service /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue-service /etc/systemd/system/catalogue.service
 validate $? "Copying catalogue service files"
 
 systemctl daemon-reload
