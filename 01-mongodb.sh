@@ -5,21 +5,21 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
-USER_ID= $(id -u)
+USER_ID=$(id -u)
 Logs_Folder="/var/log/shell-roboshop"
-Script_Name= $(echo $0 | cut -d "." -f1 )
+Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name/$Script_Name.log"
 
 mkdir -p $Logs_Folder
 echo "Script started executed at: $(date)" | tee -a $LOG_FILE
 
 if [ $USER_ID -ne 0 ]; then
-    echo -e "ERROR:: Please run this script with root privelege"
+    echo -e "$R ERROR:: $N Please run this script with root privelege"
     exit 1
 fi
 
 validate(){
-    if [$1 -ne 0]; then
+    if [ $1 -ne 0 ]; then
         echo -e "$2 ... $R FAILURE $N" | tee -a $LOG_FILE
         exit 1
     else
@@ -43,4 +43,4 @@ sed -i 's/127.0.0.0/0.0.0.0/g' /etc/mongod.conf
 validate $? "mofidified the mongo config file"
 
 systemctl restart mongod
-VALIDATE $? "Restarted MongoDB"
+validate $? "Restarted MongoDB"
