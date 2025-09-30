@@ -68,7 +68,7 @@ validate $? "Changing to app directory"
 npm install 
 validate $? "Installing dependencies"
 
-cp $SCRIPT_DIR/cart.service /etc/systemd/system/cart.service
+cp $SCRIPT_DIR/cart.repo /etc/systemd/system/cart.service
 validate $? "Copying service files"
 
 systemctl daemon-reload

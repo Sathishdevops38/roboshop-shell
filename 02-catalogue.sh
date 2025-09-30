@@ -68,7 +68,7 @@ validate $? "Unzip catalogue"
 npm install 
 validate $? "Install dependincies"
 
-cp $SCRIPT_DIR/catalogue-service /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue.repo /etc/systemd/system/catalogue.service
 validate $? "Copying catalogue service files"
 
 systemctl daemon-reload
