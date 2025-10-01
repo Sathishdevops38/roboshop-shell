@@ -40,7 +40,7 @@ dnf install nodejs -y &>>$Logs_File
 validate $? "Install nodejs 20"
 
 
-id roboshop
+id roboshop &>>$Logs_File
 
 if [ $? -ne 0 ]; then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
@@ -49,7 +49,7 @@ else
     echo -e "User already exist ... $Y SKIPPING $N"
 fi
 
-mkdir /app
+mkdir /app &>>$Logs_File
 if [ $? -ne 0 ]; then
     echo -e "app folder already exists .. $Y SKIPPING$N"
 else
@@ -62,13 +62,13 @@ validate $? "Downloading zip files"
 cd /app 
 validate $? "Changing to app directory"
 
-unzip /tmp/cart.zip
+unzip /tmp/cart.zip &>>$Logs_File
 validate $? "Unzipping files"
 
 cd /app 
 validate $? "Changing to app directory"
 
-npm install 
+npm install &>>$Logs_File
 validate $? "Installing dependencies"
 
 cp $SCRIPT_DIR/cart.repo /etc/systemd/system/cart.service

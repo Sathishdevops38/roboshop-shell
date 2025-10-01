@@ -62,13 +62,13 @@ validate $? "Downloading zip files"
 cd /app
 validate $? "Changing to app directory"
 
-unzip /tmp/user.zip
+unzip /tmp/user.zip &>>$Logs_File
 validate $? "Unzipping files"
 
 cd /app 
 validate $? "Changing to app directory"
 
-npm install 
+npm install &>>$Logs_File
 validate $? "Installing dependencies"
 
 cp $SCRIPT_DIR/user.repo /etc/systemd/system/user.service
