@@ -12,6 +12,9 @@ Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
 START_TIME=$(date +%s)
 
+mkdir -p $Logs_Folder
+echo "Script started executed at: $(date)" | tee -a $Logs_File
+
 #check the script is executing by Root user not 
 if [ $USER_ID -ne 0 ]; then
     echo -e "$R ERRROR$N:: Run the script with root privillages"

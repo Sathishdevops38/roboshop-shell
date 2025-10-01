@@ -12,6 +12,9 @@ Logs_File="$Logs_Folder/$Script_Name.log"
 START_TIME=$(date +%s)
 SCRIPT_DIR=$PWD
 
+mkdir -p $Logs_Folder
+echo "Script started executed at: $(date)" | tee -a $Logs_File
+
 if [ $USER_ID -ne 0 ]; then
     echo -e "$R ERRROR$N:: Run the script with root privillages"
     exit 1
