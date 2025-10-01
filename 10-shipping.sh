@@ -62,10 +62,10 @@ validate $? "Unzipping files"
 cd /app 
 validate $? "Changing to app directory"
 
-mvn clean package 
+mvn clean package &>>$Logs_File
 validate $? "Install and create artifact"
 
-mv target/shipping-1.0.jar shipping.jar 
+mv target/shipping-1.0.jar shipping.jar &>>$Logs_File
 validate $? "Renaming artifact"
 
 cp $SCRIPT_DIR/shipping.repo /etc/systemd/system/shipping.service
