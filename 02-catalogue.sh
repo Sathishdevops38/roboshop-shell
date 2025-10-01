@@ -10,6 +10,7 @@ USER_ID=$(id -u)
 Logs_Folder="/var/log/shell-roboshop"
 Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
+START_TIME=$(date +%s)
 SCRIPT_DIR=$PWD
 
 #check the script is executing by Root user not 
@@ -26,9 +27,9 @@ validate(){
         echo -e "$2--- $G Success $N"
     fi
 }
-
+####catalogue####
 dnf module disable nodejs -y &>>$Logs_File
-validate $? "Disabling NodeJS"
+validate $? "Disabling default NodeJS package"
 
 dnf module enable nodejs:20 -y &>>$Logs_File
 validate $? "enableing NodeJS 20"
@@ -89,11 +90,15 @@ validate $? " Install mongsh client"
 INDEX=$(mongosh mongodb.daws38sat.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
 if [ $INDEX -le 0 ]; then
     mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
-    VALIDATE $? "Load catalogue products"
+    validate $? "Load catalogue products"
 else
     echo -e "Catalogue products already loaded ... $Y SKIPPING $N"
 fi
 
 systemctl restart catalogue
-VALIDATE $? "Restarted catalogue"
+validate $? "Restarted catalogue"
+
+END_TIME=$(date +%s)
+TOTAL_TIME=$(( $END_TIME - $START_TIME ))
+echo -e "Script executed in: $Y $TOTAL_TIME Seconds $N"
 
