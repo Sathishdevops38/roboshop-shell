@@ -9,6 +9,7 @@ USER_ID=$(id -u)
 Logs_Folder="/var/log/shell-roboshop"
 Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
+SCRIPT_DIR=$PWD
 
 mkdir -p $Logs_Folder
 echo "Script started executed at: $(date)" | tee -a $LOG_FILE
@@ -27,7 +28,7 @@ validate(){
     fi
 }
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo 
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo 
 validate $? "copying files"
 
 dnf install mongodb-org -y &>>$Logs_File
