@@ -28,6 +28,7 @@ validate(){
 }
 
 ###NODE JS####
+
 dnf module disable nodejs -y &>>$Logs_File
 validate $? "Disabling NodeJS"
 
