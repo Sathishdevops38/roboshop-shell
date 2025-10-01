@@ -68,7 +68,7 @@ validate $? "Changing to app directory"
 npm install 
 validate $? "Installing dependencies"
 
-cp $SCRIPT_DIR/user.service /etc/systemd/system/user.service
+cp $SCRIPT_DIR/user.repo /etc/systemd/system/user.service
 validate $? "Copying service files"
 
 systemctl daemon-reload
