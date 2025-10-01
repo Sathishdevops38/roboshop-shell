@@ -11,6 +11,7 @@ Script_Name=$(echo $0 | cut -d "." -f1 )
 Logs_File="$Logs_Folder/$Script_Name.log"
 START_TIME=$(date +%s)
 SCRIPT_DIR=$PWD
+MYSQL_HOST=mysql.daws38sat.fun
 
 mkdir -p $Logs_Folder
 echo "Script started executed at: $(date)" | tee -a $Logs_File
@@ -78,6 +79,19 @@ validate $? "enabling shipping service"
 
 systemctl start shipping
 validate $? "starting shipping service"
+
+dnf install mysql -y  &>>$Logs_File
+
+mysql -h $MYSQL_HOST -uroot -pRoboShop@1 -e 'use cities' &>>$Logs_File
+if [ $? -ne 0 ]; then
+    mysql -h $MYSQL_HOST -uroot -pRoboShop@1 < /app/db/schema.sql &>>$Logs_File
+    mysql -h $MYSQL_HOST -uroot -pRoboShop@1 < /app/db/app-user.sql  &>>$Logs_File
+    mysql -h $MYSQL_HOST -uroot -pRoboShop@1 < /app/db/master-data.sql &>>$Logs_File
+else
+    echo -e "Shipping data is already loaded ... $Y SKIPPING $N"
+fi
+
+systemctl restart shipping
 
 END_TIME=$(date +%s)
 TOTAL_TIME=$(( $END_TIME - $START_TIME ))
