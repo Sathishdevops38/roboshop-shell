@@ -1,93 +1,82 @@
 #!/bin/bash
 
+USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
-
-USER_ID=$(id -u)
-Logs_Folder="/var/log/shell-roboshop"
-Script_Name=$(echo $0 | cut -d "." -f1 )
-Logs_File="$Logs_Folder/$Script_Name.log"
-START_TIME=$(date +%s)
+LOGS_FOLDER="/var/log/shell-roboshop"
+SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 SCRIPT_DIR=$PWD
+MONGODB_HOST=mongodb.daws86s.fun
+LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
-#check the script is executing by Root user not 
-if [ $USER_ID -ne 0 ]; then
-    echo -e "$R ERRROR$N:: Run the script with root privillages"
-    exit 1
+mkdir -p $LOGS_FOLDER
+echo "Script started executed at: $(date)" | tee -a $LOG_FILE
+
+if [ $USERID -ne 0 ]; then
+    echo "ERROR:: Please run this script with root privelege"
+    exit 1 # failure is other than 0
 fi
 
-validate(){
+validate(){ # functions receive inputs through args just like shell script args
     if [ $1 -ne 0 ]; then
-        echo -e "$2 --- $R Failure $N"
+        echo -e "$2 ... $R FAILURE $N" | tee -a $LOG_FILE
         exit 1
     else
-        echo -e "$2--- $G Success $N"
+        echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
-####catalogue####
-dnf module disable nodejs -y &>>$Logs_File
-validate $? "Disabling default NodeJS package"
 
-dnf module enable nodejs:20 -y &>>$Logs_File
-validate $? "enableing NodeJS 20"
-
-dnf install nodejs -y &>>$Logs_File
+##### NodeJS ####
+dnf module disable nodejs -y &>>$LOG_FILE
+validate $? "Disabling NodeJS"
+dnf module enable nodejs:20 -y  &>>$LOG_FILE
+validate $? "Enabling NodeJS 20"
+dnf install nodejs -y &>>$LOG_FILE
 validate $? "Installing NodeJS"
 
-id roboshop &>>$Logs_File
-
+id roboshop &>>$LOG_FILE
 if [ $? -ne 0 ]; then
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
     validate $? "Creating system user"
 else
     echo -e "User already exist ... $Y SKIPPING $N"
 fi
 
-mkdir /app
-if [ $? -ne 0 ]; then
-    echo -e "app folder already exists .. $Y SKIPPING$N"
-else
-    validate $? "Creating app directory"
-fi    
+mkdir -p /app
+validate $? "Creating app directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
 validate $? "Downloading catalogue application"
 
 cd /app 
-validate $? " changing to app directory"
+validate $? "Changing to app directory"
 
 rm -rf /app/*
-validate $? "Remove existing code"
+validate $? "Removing existing code"
 
-unzip /tmp/catalogue.zip
-validate $? "Unzip catalogue"
+unzip /tmp/catalogue.zip &>>$LOG_FILE
+validate $? "unzip catalogue"
 
-npm install 
-validate $? "Install dependincies"
+npm install &>>$LOG_FILE
+validate $? "Install dependencies"
 
 cp $SCRIPT_DIR/catalogue.repo /etc/systemd/system/catalogue.service
-validate $? "Copying catalogue service files"
+validate $? "Copy systemctl service"
 
 systemctl daemon-reload
-validate $? "Reload demon"
-
-systemctl enable catalogue 
-validate $? "Enabling catalogue service"
-
-systemctl start catalogue
-validate $? "Starting catalogue service"
+systemctl enable catalogue &>>$LOG_FILE
+validate $? "Enable catalogue"
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
-validate $? "Copying mongo files"
+validate $? "Copy mongo repo"
 
-dnf install mongodb-mongosh -y &>>$Logs_File
-validate $? " Install mongsh client"
+dnf install mongodb-mongosh -y &>>$LOG_FILE
+validate $? "Install MongoDB client"
 
-
-INDEX=$(mongosh mongodb.daws38sat.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
+INDEX=$(mongosh mongodb.daws86s.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
 if [ $INDEX -le 0 ]; then
     mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
     validate $? "Load catalogue products"
@@ -97,8 +86,3 @@ fi
 
 systemctl restart catalogue
 validate $? "Restarted catalogue"
-
-END_TIME=$(date +%s)
-TOTAL_TIME=$(( $END_TIME - $START_TIME ))
-echo -e "Script executed in: $Y $TOTAL_TIME Seconds $N"
-
